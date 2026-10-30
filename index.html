@@ -469,21 +469,46 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DOS MAPAS (Imagens locais)
+        // CONFIGURAÇÃO DOS MAPAS (com suporte automático a .png e .jpg)
         const maps = [
             { 
                 name: "Rebirth Island", 
-                image: "assets/rebirth-island.jpg"
+                image: "assets/rebirth-island.png",
+                fallback: "assets/rebirth-island.jpg"
             },
             { 
                 name: "Vazio Assombrado", 
-                image: "assets/vazio-assombrado.jpg"
+                image: "assets/vazio-assombrado.jpg",
+                fallback: "assets/vazio-assombrado.png"
             },
             { 
                 name: "Fortunes Keep", 
-                image: "assets/fortunes-keep.jpg"
+                image: "assets/fortunes-keep.jpg",
+                fallback: "assets/fortunes-keep.png"
             }
         ];
+
+        // Cache para resolver extensões corretas (.png / .jpg) automaticamente
+        const resolvedMapImages = {};
+
+        function getMapImage(mapObj) {
+            if (resolvedMapImages[mapObj.name]) {
+                return resolvedMapImages[mapObj.name];
+            }
+
+            resolvedMapImages[mapObj.name] = mapObj.image;
+
+            const testImg = new Image();
+            testImg.onerror = () => {
+                if (mapObj.fallback && resolvedMapImages[mapObj.name] !== mapObj.fallback) {
+                    resolvedMapImages[mapObj.name] = mapObj.fallback;
+                    updateTracker();
+                }
+            };
+            testImg.src = mapObj.image;
+
+            return resolvedMapImages[mapObj.name];
+        }
         
         const DURATION_MS = 10 * 60 * 1000; // 10 minutos por mapa
         const OFFSET_BLOCKS = 1; // Calibragem dos blocos de horário
@@ -521,21 +546,24 @@
             const currentMapObj = maps[currentMapIndex];
             const nextMapObj = maps[nextMapIndex];
 
+            const currentImg = getMapImage(currentMapObj);
+            const nextImg = getMapImage(nextMapObj);
+
             // Atualiza o fundo da página quando o mapa mudar
             if (lastActiveMapIndex !== currentMapIndex) {
-                applyGlobalBackground(currentMapObj.image);
+                applyGlobalBackground(currentImg);
                 lastActiveMapIndex = currentMapIndex;
             }
 
             document.getElementById('current-map').innerText = currentMapObj.name;
             document.getElementById('next-map').innerText = nextMapObj.name;
             
-            applyCardBackground('current-map-block', currentMapObj.image);
+            applyCardBackground('current-map-block', currentImg);
             
             // Aplica a imagem de fundo no banner de visualização do próximo mapa
             const nextPreviewEl = document.getElementById('next-map-preview');
             if (nextPreviewEl) {
-                nextPreviewEl.style.backgroundImage = `url('${nextMapObj.image}')`;
+                nextPreviewEl.style.backgroundImage = `url('${nextImg}')`;
             }
 
             // Timer do mapa atual
@@ -545,8 +573,9 @@
             const rebirthIndex = maps.findIndex(m => m.name === "Rebirth Island");
             const rebirthObj = maps[rebirthIndex];
             const rebirthTimerEl = document.getElementById('rebirth-timer');
+            const rebirthImg = getMapImage(rebirthObj);
             
-            applyCardBackground('rebirth-block', rebirthObj.image);
+            applyCardBackground('rebirth-block', rebirthImg);
 
             if (currentMapIndex === rebirthIndex) {
                 rebirthTimerEl.innerText = "ATIVO AGORA";
