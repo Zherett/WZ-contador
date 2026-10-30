@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#0d0d12">
+    <title>WZ Ressurgência Timer</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0f;
+            --panel-bg: rgba(18, 18, 28, 0.82);
+            --accent-orange: #ff6b00;
+            --accent-orange-glow: rgba(255, 107, 0, 0.4);
+            --accent-purple: #8a2be2;
+            --accent-purple-glow: rgba(138, 43, 226, 0.35);
+            --accent-green: #00ff7f;
+            --text-light: #f3f4f8;
+            --text-muted: #9ba1b0;
+            --border-subtle: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            padding: 14px 14px 36px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Fundo Dinâmico com Imagem do Mapa Atual */
+        .global-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+            filter: blur(10px) brightness(0.24);
+            transform: scale(1.08); /* Evita bordas brancas com o blur */
+            transition: background-image 0.8s ease-in-out;
+            pointer-events: none;
+        }
+
+        /* Camada escura / vinheta por cima do fundo para máxima legibilidade */
+        .global-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: radial-gradient(circle at 50% 25%, rgba(138, 43, 226, 0.15) 0%, rgba(10, 10, 15, 0.82) 55%, rgba(6, 6, 10, 0.96) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 0 auto;
+        }
+
+        /* Cabeçalho da Marca */
+        .brand-header {
+            text-align: center;
+            padding: 6px 0 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .brand-pill {
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--accent-orange);
+            background: rgba(255, 107, 0, 0.12);
+            border: 1px solid rgba(255, 107, 0, 0.3);
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .brand-title {
+            font-size: clamp(1.4rem, 5.2vw, 1.85rem);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Barra de Controle: Fuso Horário e Status de Tela Ativa */
+        .header-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .timezone-selector {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .timezone-select-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .timezone-select-group label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        select {
+            background: #151522;
+            color: #ffffff;
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.86rem;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        select:focus {
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 10px var(--accent-orange-glow);
+        }
+
+        .clock-display {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            letter-spacing: 1px;
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 107, 0, 0.25);
+            white-space: nowrap;
+        }
+
+        /* Botão de Manter Tela Ligada (Wake Lock) */
+        .wake-lock-status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 8px 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.25s ease;
+            width: 100%;
+        }
+
+        .wake-lock-status:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .wake-lock-status.active {
+            color: var(--accent-green);
+            border-color: rgba(0, 255, 127, 0.45);
+            background: rgba(0, 255, 127, 0.08);
+            box-shadow: 0 0 14px rgba(0, 255, 127, 0.15);
+        }
+
+        .wake-lock-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #666;
+            display: inline-block;
+            transition: background-color 0.2s ease;
+        }
+
+        .wake-lock-status.active .wake-lock-dot {
+            background-color: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        /* Cartões de Mapa */
+        .map-block {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 22px 16px;
+            text-align: center;
+            box-shadow: 0 8px 26px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .map-block.active {
+            border: 2px solid var(--accent-orange);
+            box-shadow: 0 0 28px var(--accent-orange-glow);
+        }
+
+        .label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .map-name {
+            font-size: clamp(1.85rem, 6.5vw, 2.6rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin: 0 0 14px 0;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+            word-break: break-word;
+        }
+
+        .active .map-name {
+            color: #fff;
+            text-shadow: 0 0 16px var(--accent-orange-glow), 0 2px 8px rgba(0,0,0,0.9);
+        }
+
+        .timer-display {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: clamp(2.2rem, 8vw, 3.1rem);
+            font-weight: 800;
+            color: var(--text-light);
+            background: rgba(8, 8, 12, 0.78);
+            padding: 8px 18px;
+            border-radius: 10px;
+            display: inline-block;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            letter-spacing: 2px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.65);
+        }
+
+        .next-map-name {
+            font-size: clamp(1.35rem, 5.2vw, 1.75rem);
+            font-weight: 700;
+            color: #d1d5db;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .rebirth-timer-block {
+            border-color: rgba(138, 43, 226, 0.6);
+            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.2);
+        }
+        
+        .rebirth-timer-block .label {
+            color: #bb86fc;
+        }
+
+        .rebirth-status-active {
+            color: var(--accent-green) !important;
+            font-size: clamp(1.8rem, 6vw, 2.4rem) !important;
+            text-shadow: 0 0 15px rgba(0, 255, 127, 0.5);
+        }
+
+        /* Rodapé */
+        .footer-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #888899;
+            margin-top: 4px;
+        }
+
+        /* Ajustes para telas bem estreitas (< 380px) */
+        @media (max-width: 380px) {
+            body {
+                padding: 10px 10px 24px;
+            }
+            .timezone-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .timezone-select-group {
+                width: 100%;
+            }
+            select {
+                max-width: 100%;
+            }
+            .clock-display {
+                text-align: center;
+            }
+            .map-block {
+                padding: 18px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fundo de Tela Dinâmico -->
+    <div class="global-bg" id="global-bg"></div>
+    <div class="global-overlay"></div>
+
+    <div class="container">
+        <!-- Título do Aplicativo -->
+        <div class="brand-header">
+            <span class="brand-pill">Call of Duty</span>
+            <h1 class="brand-title">WZ Ressurgência Timer</h1>
+        </div>
+
+        <!-- Seletor de Fuso Horário, Relógio e Wake Lock -->
+        <header class="header-panel">
+            <div class="timezone-selector">
+                <div class="timezone-select-group">
+                    <label for="tz">Fuso:</label>
+                    <select id="tz">
+                        <!-- Fusos do Brasil (Cobertura Completa) -->
+                        <optgroup label="Brasil (Todos os Fusos)">
+                            <option value="America/Sao_Paulo" selected>Brasília / SP / RJ / Sul / Nordeste (UTC-3)</option>
+                            <option value="America/Manaus">Manaus / AM / RO / RR (UTC-4)</option>
+                            <option value="America/Cuiaba">Cuiabá / MT / MS (UTC-4)</option>
+                            <option value="America/Belem">Belém / PA / AP (UTC-3)</option>
+                            <option value="America/Rio_Branco">Acre / Rio Branco (UTC-5)</option>
+                            <option value="America/Noronha">Fernando de Noronha (UTC-2)</option>
+                        </optgroup>
+                        <!-- Fusos Internacionais -->
+                        <optgroup label="Internacional">
+                            <option value="UTC">UTC (Global)</option>
+                            <option value="America/New_York">Nova York (UTC-5/UTC-4)</option>
+                            <option value="Europe/Lisbon">Lisboa / Portugal (UTC+0/UTC+1)</option>
+                            <option value="Europe/London">Londres (UTC+0/UTC+1)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="clock-display" id="local-clock">00:00:00</div>
+            </div>
+
+            <!-- Botão e indicador de Tela Sempre Ligada (Wake Lock) -->
+            <button class="wake-lock-status" id="wake-lock-btn" type="button" title="Clique para ativar/desativar tela sempre ligada">
+                <span class="wake-lock-dot"></span>
+                <span id="wake-lock-text">Tela sempre ativa: Ativando...</span>
+            </button>
+        </header>
+
+        <!-- Bloco do Mapa Atual -->
+        <main class="map-block active" id="current-map-block">
+            <div class="label">Mapa Atual</div>
+            <h2 class="map-name" id="current-map">Carregando...</h2>
+            <div class="label">Tempo Restante</div>
+            <div class="timer-display" id="current-timer">00:00</div>
+        </main>
+
+        <!-- Bloco do Próximo Mapa -->
+        <section class="map-block" id="next-map-block">
+            <div class="label">Próximo Mapa</div>
+            <div class="next-map-name" id="next-map">Carregando...</div>
+        </section>
+
+        <!-- Bloco do Contador Rebirth -->
+        <section class="map-block rebirth-timer-block" id="rebirth-block">
+            <div class="label">Tempo para Rebirth Island</div>
+            <div class="timer-display" id="rebirth-timer">00:00</div>
+        </section>
+
+        <footer class="footer-note">
+            Rotação automática de 10 min • Sincronizado com servidores
+        </footer>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO DOS MAPAS (Imagens locais)
+        const maps = [
+            { 
+                name: "Rebirth Island", 
+                image: "assets/rebirth-island.jpg"
+            },
+            { 
+                name: "Vazio Assombrado", 
+                image: "assets/vazio-assombrado.jpg"
+            },
+            { 
+                name: "Fortunes Keep", 
+                image: "assets/fortunes-keep.jpg"
+            }
+        ];
+        
+        const DURATION_MS = 10 * 60 * 1000; // 10 minutos por mapa
+        const OFFSET_BLOCKS = 1; // Calibragem dos blocos de horário
+
+        // Helper para aplicar imagem com gradiente no cartão
+        function applyCardBackground(elementId, imageUrl) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.style.backgroundImage = `linear-gradient(rgba(10, 10, 15, 0.65), rgba(10, 10, 15, 0.88)), url('${imageUrl}')`;
+        }
+
+        // Helper para atualizar o fundo de tela geral da página
+        function applyGlobalBackground(imageUrl) {
+            const bgEl = document.getElementById('global-bg');
+            if (bgEl) {
+                bgEl.style.backgroundImage = `url('${imageUrl}')`;
+            }
+        }
+
+        let lastActiveMapIndex = -1;
+
+        function updateTracker() {
+            const now = Date.now();
+            
+            // 1. Lógica Global da Rotação
+            const currentBlock = Math.floor(now / DURATION_MS);
+            const currentMapIndex = (currentBlock + OFFSET_BLOCKS) % maps.length;
+            const nextMapIndex = (currentMapIndex + 1) % maps.length;
+            
+            // Tempo restante no bloco atual (10 min)
+            const msElapsedInBlock = now % DURATION_MS;
+            const msRemainingInBlock = DURATION_MS - msElapsedInBlock;
+            
+            // 2. Atualizar UI - Mapa Atual e Próximo
+            const currentMapObj = maps[currentMapIndex];
+            const nextMapObj = maps[nextMapIndex];
+
+            // Atualiza o fundo da página quando o mapa mudar
+            if (lastActiveMapIndex !== currentMapIndex) {
+                applyGlobalBackground(currentMapObj.image);
+                lastActiveMapIndex = currentMapIndex;
+            }
+
+            document.getElementById('current-map').innerText = currentMapObj.name;
+            document.getElementById('next-map').innerText = nextMapObj.name;
+            
+            applyCardBackground('current-map-block', currentMapObj.image);
+            applyCardBackground('next-map-block', nextMapObj.image);
+
+            // Timer do mapa atual
+            document.getElementById('current-timer').innerText = formatTime(msRemainingInBlock);
+
+            // 3. Lógica do Tempo para o Rebirth Island
+            const rebirthIndex = maps.findIndex(m => m.name === "Rebirth Island");
+            const rebirthObj = maps[rebirthIndex];
+            const rebirthTimerEl = document.getElementById('rebirth-timer');
+            
+            applyCardBackground('rebirth-block', rebirthObj.image);
+
+            if (currentMapIndex === rebirthIndex) {
+                rebirthTimerEl.innerText = "ATIVO AGORA";
+                rebirthTimerEl.classList.add('rebirth-status-active');
+            } else {
+                rebirthTimerEl.classList.remove('rebirth-status-active');
+                
+                // Distância em blocos até o Rebirth
+                const blocksUntilRebirth = (rebirthIndex - currentMapIndex + maps.length) % maps.length;
+                const msUntilRebirth = msRemainingInBlock + ((blocksUntilRebirth - 1) * DURATION_MS);
+                
+                rebirthTimerEl.innerText = formatTime(msUntilRebirth);
+            }
+
+            // 4. Atualizar Relógio Local
+            updateClock();
+        }
+
+        function updateClock() {
+            const tz = document.getElementById('tz').value;
+            try {
+                const timeString = new Date().toLocaleTimeString('pt-BR', { timeZone: tz });
+                document.getElementById('local-clock').innerText = timeString;
+            } catch (e) {
+                document.getElementById('local-clock').innerText = new Date().toLocaleTimeString('pt-BR');
+            }
+        }
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // ==========================================
+        // SCREEN WAKE LOCK API (TELA SEMPRE LIGADA)
+        // ==========================================
+        let wakeLockSentinel = null;
+        let isWakeLockRequested = true;
+        const wakeLockBtn = document.getElementById('wake-lock-btn');
+        const wakeLockText = document.getElementById('wake-lock-text');
+
+        function updateWakeLockUI(isActive, message = null) {
+            if (isActive) {
+                wakeLockBtn.classList.add('active');
+                wakeLockText.innerText = message || "Tela sempre ativa: Ligada";
+            } else {
+                wakeLockBtn.classList.remove('active');
+                wakeLockText.innerText = message || "Toque para manter tela ligada";
+            }
+        }
+
+        async function requestScreenWakeLock() {
+            if (!('wakeLock' in navigator)) {
+                updateWakeLockUI(false, "Tela ativa não suportada neste celular");
+                wakeLockBtn.style.cursor = "default";
+                return;
+            }
+
+            try {
+                wakeLockSentinel = await navigator.wakeLock.request('screen');
+                updateWakeLockUI(true);
+
+                wakeLockSentinel.addEventListener('release', () => {
+                    wakeLockSentinel = null;
+                    if (isWakeLockRequested && document.visibilityState === 'visible') {
+                        requestScreenWakeLock();
+                    } else {
+                        updateWakeLockUI(false);
+                    }
+                });
+            } catch (err) {
+                console.log("Wake Lock em background ou requer gesto:", err.message);
+                updateWakeLockUI(false, "Toque para manter tela ligada");
+            }
+        }
+
+        async function releaseScreenWakeLock() {
+            isWakeLockRequested = false;
+            if (wakeLockSentinel !== null) {
+                await wakeLockSentinel.release();
+                wakeLockSentinel = null;
+            }
+            updateWakeLockUI(false, "Tela sempre ativa: Desligada");
+        }
+
+        // Toggle manual pelo usuário ao clicar no botão
+        wakeLockBtn.addEventListener('click', async () => {
+            if (wakeLockSentinel !== null) {
+                await releaseScreenWakeLock();
+            } else {
+                isWakeLockRequested = true;
+                await requestScreenWakeLock();
+            }
+        });
+
+        // Reativar quando o usuário volta para a aba do navegador
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && isWakeLockRequested) {
+                await requestScreenWakeLock();
+            }
+        });
+
+        // Tentar ativar na primeira interação de toque do usuário
+        const enableWakeLockOnGesture = async () => {
+            if (!wakeLockSentinel && isWakeLockRequested) {
+                await requestScreenWakeLock();
+            }
+            window.removeEventListener('touchstart', enableWakeLockOnGesture);
+            window.removeEventListener('click', enableWakeLockOnGesture);
+        };
+        window.addEventListener('touchstart', enableWakeLockOnGesture, { once: true, passive: true });
+        window.addEventListener('click', enableWakeLockOnGesture, { once: true, passive: true });
+
+        // Event listener para mudança no fuso horário
+        document.getElementById('tz').addEventListener('change', updateClock);
+
+        // Inicialização
+        requestScreenWakeLock();
+        setInterval(updateTracker, 1000);
+        updateTracker();
+    </script>
+</body>
+</html>
