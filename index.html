@@ -290,11 +290,60 @@
             box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.65);
         }
 
+        .next-map-block {
+            padding: 16px;
+        }
+
+        .next-map-preview {
+            width: 100%;
+            height: 135px;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        .next-map-preview::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(10, 10, 15, 0.3) 0%, rgba(10, 10, 15, 0.78) 100%);
+            z-index: 1;
+        }
+
         .next-map-name {
-            font-size: clamp(1.35rem, 5.2vw, 1.75rem);
+            position: relative;
+            z-index: 2;
+            font-size: clamp(1.4rem, 5.5vw, 1.9rem);
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
+            letter-spacing: 0.5px;
+        }
+
+        .next-map-badge {
+            position: relative;
+            z-index: 2;
+            font-size: 0.72rem;
             font-weight: 700;
-            color: #d1d5db;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-orange);
+            background: rgba(10, 10, 15, 0.75);
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-top: 6px;
+            border: 1px solid rgba(255, 107, 0, 0.4);
         }
 
         .rebirth-timer-block {
@@ -400,9 +449,12 @@
         </main>
 
         <!-- Bloco do Próximo Mapa -->
-        <section class="map-block" id="next-map-block">
+        <section class="map-block next-map-block" id="next-map-block">
             <div class="label">Próximo Mapa</div>
-            <div class="next-map-name" id="next-map">Carregando...</div>
+            <div class="next-map-preview" id="next-map-preview">
+                <div class="next-map-name" id="next-map">Carregando...</div>
+                <span class="next-map-badge">A Seguir</span>
+            </div>
         </section>
 
         <!-- Bloco do Contador Rebirth -->
@@ -479,7 +531,12 @@
             document.getElementById('next-map').innerText = nextMapObj.name;
             
             applyCardBackground('current-map-block', currentMapObj.image);
-            applyCardBackground('next-map-block', nextMapObj.image);
+            
+            // Aplica a imagem de fundo no banner de visualização do próximo mapa
+            const nextPreviewEl = document.getElementById('next-map-preview');
+            if (nextPreviewEl) {
+                nextPreviewEl.style.backgroundImage = `url('${nextMapObj.image}')`;
+            }
 
             // Timer do mapa atual
             document.getElementById('current-timer').innerText = formatTime(msRemainingInBlock);
