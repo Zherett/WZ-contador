@@ -350,10 +350,6 @@
             border-color: rgba(138, 43, 226, 0.6);
             box-shadow: 0 4px 20px rgba(138, 43, 226, 0.2);
         }
-        
-        .rebirth-timer-block .label {
-            color: #bb86fc;
-        }
 
         .rebirth-status-active {
             color: var(--accent-green) !important;
@@ -512,6 +508,7 @@
         
         const DURATION_MS = 10 * 60 * 1000; // 10 minutos por mapa
         const OFFSET_BLOCKS = 1; // Calibragem dos blocos de horário
+        const DELAY_OFFSET_MS = -500; // Atraso de 0,5s no timer para sincronização perfeita
 
         // Helper para aplicar imagem com gradiente no cartão
         function applyCardBackground(elementId, imageUrl) {
@@ -531,7 +528,8 @@
         let lastActiveMapIndex = -1;
 
         function updateTracker() {
-            const now = Date.now();
+            // Aplica o atraso calibrado de 0,5 segundos
+            const now = Date.now() + DELAY_OFFSET_MS;
             
             // 1. Lógica Global da Rotação
             const currentBlock = Math.floor(now / DURATION_MS);
@@ -696,7 +694,7 @@
 
         // Inicialização
         requestScreenWakeLock();
-        setInterval(updateTracker, 1000);
+        setInterval(updateTracker, 250); // Atualiza com precisão de frações de segundo
         updateTracker();
     </script>
 </body>
