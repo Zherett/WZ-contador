@@ -350,118 +350,118 @@
             box-shadow: 0 0 14px rgba(0, 255, 127, 0.3);
         }
 
-        /* Botão Mini Pop-up na Tela */
-        .mini-popup-btn {
-            color: #d1d5db;
-        }
-
-        .mini-popup-btn.active {
-            color: var(--accent-orange);
-            border-color: var(--accent-orange);
-            background: rgba(255, 107, 0, 0.2);
-            box-shadow: 0 0 12px var(--accent-orange-glow);
-        }
-
-        /* Mini Pop-up Flutuante In-Page (Arrastável) */
-        .in-page-popup {
-            position: fixed;
-            bottom: 24px;
-            right: 20px;
-            width: 220px;
-            background: rgba(14, 14, 22, 0.94);
-            border: 1.5px solid var(--accent-orange);
-            border-radius: 14px;
-            padding: 12px 14px;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85), 0 0 20px var(--accent-orange-glow);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            z-index: 99999;
-            user-select: none;
-            touch-action: none;
-            cursor: grab;
-            transition: border-color 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .in-page-popup:active {
-            cursor: grabbing;
-        }
-
-        .in-page-popup.rebirth-active {
-            border-color: var(--accent-green);
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85), 0 0 22px rgba(0, 255, 127, 0.35);
-        }
-
-        .in-page-popup-header {
+        /* Layout Grid do Dashboard (Mobile vs PC) */
+        .dashboard-grid {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 4px;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
         }
 
-        .in-page-popup-pill {
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-orange);
+        .side-blocks {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
         }
 
-        .in-page-popup.rebirth-active .in-page-popup-pill {
-            color: var(--accent-green);
-        }
+        /* ==========================================
+           VERSÃO DISCRETA E ELEGANTE PARA PC (DESKTOP)
+           ========================================== */
+        @media (min-width: 768px) {
+            body {
+                padding: 18px 24px 30px;
+                justify-content: center;
+            }
 
-        .in-page-popup-close {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.3rem;
-            line-height: 1;
-            cursor: pointer;
-            padding: 0 4px;
-        }
+            .container {
+                max-width: 780px;
+                gap: 12px;
+            }
 
-        .in-page-popup-close:hover {
-            color: #ffffff;
-        }
+            .brand-header {
+                padding: 2px 0;
+            }
 
-        .in-page-popup-map {
-            font-size: 0.92rem;
-            font-weight: 900;
-            color: #ffffff;
-            text-transform: uppercase;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 2px;
-        }
+            .brand-title {
+                font-size: 1.45rem;
+                letter-spacing: 0.5px;
+            }
 
-        .in-page-popup-timer {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 1.7rem;
-            font-weight: 800;
-            color: var(--text-light);
-            letter-spacing: 1.5px;
-            line-height: 1.1;
-        }
+            .brand-pill {
+                font-size: 0.62rem;
+                padding: 2px 8px;
+            }
 
-        .in-page-popup.rebirth-active .in-page-popup-timer {
-            color: var(--accent-green);
-            text-shadow: 0 0 10px rgba(0, 255, 127, 0.5);
-        }
+            .header-panel {
+                padding: 6px 12px;
+            }
 
-        .in-page-popup-footer {
-            margin-top: 6px;
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding-top: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+            /* No PC o grid divide em 2 colunas proporcionais */
+            .dashboard-grid {
+                display: grid;
+                grid-template-columns: 1.15fr 0.85fr;
+                gap: 14px;
+                align-items: stretch;
+            }
 
-        .in-page-popup-footer b {
-            color: #ffffff;
+            .current-map-card {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 24px 18px;
+            }
+
+            .current-map-card .map-name {
+                font-size: 1.85rem;
+                margin-bottom: 10px;
+            }
+
+            .current-map-card .timer-display {
+                font-size: 2.35rem;
+                padding: 6px 16px;
+            }
+
+            .side-blocks {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                justify-content: space-between;
+            }
+
+            .next-map-block {
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .next-map-preview {
+                height: 85px;
+            }
+
+            .next-map-name {
+                font-size: 1.25rem;
+            }
+
+            .rebirth-timer-block {
+                padding: 12px 14px;
+            }
+
+            .rebirth-timer-block .label {
+                margin-bottom: 4px;
+            }
+
+            .rebirth-timer-block .timer-display {
+                font-size: 1.6rem;
+                padding: 4px 12px;
+            }
+
+            .footer-note {
+                font-size: 0.7rem;
+                margin-top: 2px;
+            }
         }
 
         /* Cartões de Mapa */
@@ -679,64 +679,55 @@
                 </div>
 
                 <div class="header-actions">
-                    <button class="action-btn wake-lock-status" id="wake-lock-btn" type="button" title="Clique para ativar/desativar tela sempre ligada">
-                        <span class="wake-lock-dot"></span>
-                        <span id="wake-lock-text">Tela sempre ativa: Ativando...</span>
-                    </button>
                     <div class="action-row">
-                        <button class="action-btn pip-btn" id="pip-btn" type="button" title="Ativar pop-up flutuante sobreposto (PiP)">
+                        <button class="action-btn wake-lock-status" id="wake-lock-btn" type="button" title="Clique para ativar/desativar tela sempre ligada">
+                            <span class="wake-lock-dot"></span>
+                            <span id="wake-lock-text">Tela sempre ativa</span>
+                        </button>
+                        <button class="action-btn pip-btn" id="pip-btn" type="button" title="Ativar pop-up flutuante sobreposto (Picture-in-Picture)">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><rect x="12" y="8" width="8" height="6" rx="1"/></svg>
                             <span id="pip-text">Pop-up Sobreposto</span>
-                        </button>
-                        <button class="action-btn mini-popup-btn" id="mini-popup-btn" type="button" title="Fixar mini card flutuante nesta tela">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10m-4-6h8M7 16l5 6 5-6H7z"/></svg>
-                            <span id="mini-popup-text">Mini Pop-up</span>
                         </button>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Bloco do Mapa Atual -->
-        <main class="map-block active" id="current-map-block">
-            <div class="label">Mapa Atual</div>
-            <h2 class="map-name" id="current-map">Carregando...</h2>
-            <div class="label">Tempo Restante</div>
-            <div class="timer-display" id="current-timer">00:00</div>
-        </main>
+        <!-- Dashboard dos Mapas (Grid no PC, Stack no Mobile) -->
+        <div class="dashboard-grid">
+            <!-- Bloco do Mapa Atual -->
+            <main class="map-block active current-map-card" id="current-map-block">
+                <div class="label">Mapa Atual</div>
+                <h2 class="map-name" id="current-map">Carregando...</h2>
+                <div class="label">Tempo Restante</div>
+                <div class="timer-display" id="current-timer">00:00</div>
+            </main>
 
-        <!-- Bloco do Próximo Mapa -->
-        <section class="map-block next-map-block" id="next-map-block">
-            <div class="label">Próximo Mapa</div>
-            <div class="next-map-preview" id="next-map-preview">
-                <div class="next-map-name" id="next-map">Carregando...</div>
-                <span class="next-map-badge">A Seguir</span>
+            <!-- Coluna Lateral no PC (Próximo Mapa + Rebirth) -->
+            <div class="side-blocks">
+                <!-- Bloco do Próximo Mapa -->
+                <section class="map-block next-map-block" id="next-map-block">
+                    <div class="label">Próximo Mapa</div>
+                    <div class="next-map-preview" id="next-map-preview">
+                        <div class="next-map-name" id="next-map">Carregando...</div>
+                        <span class="next-map-badge">A Seguir</span>
+                    </div>
+                </section>
+
+                <!-- Bloco do Contador Rebirth -->
+                <section class="map-block rebirth-timer-block" id="rebirth-block">
+                    <div class="label">Tempo para Rebirth Island</div>
+                    <div class="timer-display" id="rebirth-timer">00:00</div>
+                </section>
             </div>
-        </section>
-
-        <!-- Bloco do Contador Rebirth -->
-        <section class="map-block rebirth-timer-block" id="rebirth-block">
-            <div class="label">Tempo para Rebirth Island</div>
-            <div class="timer-display" id="rebirth-timer">00:00</div>
-        </section>
+        </div>
 
         <footer class="footer-note">
             Rotação automática de 10 min • Sincronizado com servidores
         </footer>
     </div>
 
-    <!-- Mini Pop-up Flutuante na Tela (Arrastável) -->
-    <aside class="in-page-popup" id="in-page-popup" style="display: none;" aria-label="Pop-up flutuante do mapa">
-        <div class="in-page-popup-header">
-            <span class="in-page-popup-pill" id="popup-pill">● ROTAÇÃO</span>
-            <button type="button" class="in-page-popup-close" id="close-popup-btn" aria-label="Fechar pop-up">&times;</button>
-        </div>
-        <div class="in-page-popup-map" id="popup-map-name">Carregando...</div>
-        <div class="in-page-popup-timer" id="popup-timer">00:00</div>
-        <div class="in-page-popup-footer" id="popup-footer">
-            Próximo: <b id="popup-next-map">...</b>
-        </div>
-    </aside>
+
 
     <script>
         // CONFIGURAÇÃO DOS MAPAS (com suporte automático a .png e .jpg)
@@ -869,18 +860,20 @@
             // 4. Atualizar Relógio Local
             updateClock();
 
-            // 5. Atualizar Pop-up Sobreposto (PiP Canvas) e Mini Pop-up na Tela
+            // 5. Atualizar Pop-up Sobreposto (PiP Canvas no Celular ou HUD no PC)
             const currentTimerFormatted = formatTime(msRemainingInBlock);
             const clockTextVal = document.getElementById('local-clock').innerText || "";
 
-            updateInPagePopup({
+            renderPipCanvas({
                 currentMap: currentMapObj.name,
                 timerText: currentTimerFormatted,
                 nextMap: nextMapObj.name,
-                isRebirthActive: isRebirth
+                rebirthText: rebirthTextVal,
+                isRebirthActive: isRebirth,
+                clockText: clockTextVal
             });
 
-            renderPipCanvas({
+            updateDesktopPipWindow({
                 currentMap: currentMapObj.name,
                 timerText: currentTimerFormatted,
                 nextMap: nextMapObj.name,
@@ -997,8 +990,12 @@
 
 
         // ==========================================
-        // PICTURE-IN-PICTURE (POP-UP SOBREPOSTO)
+        // POP-UP SOBREPOSTO (PICTURE-IN-PICTURE)
+        // Versão Discreta para PC (Document PiP) & Celular (Canvas PiP)
         // ==========================================
+        let desktopPipWindow = null;
+        let pipStream = null;
+
         const pipCanvas = document.createElement('canvas');
         pipCanvas.width = 480;
         pipCanvas.height = 270;
@@ -1020,98 +1017,262 @@
 
         const pipBtn = document.getElementById('pip-btn');
         const pipText = document.getElementById('pip-text');
-        let pipStream = null;
 
+        function setPipActiveState(isActive) {
+            if (isActive) {
+                pipBtn.classList.add('active');
+                pipText.innerText = "Pop-up Ativo";
+            } else {
+                pipBtn.classList.remove('active');
+                pipText.innerText = "Pop-up Sobreposto";
+            }
+        }
+
+        // Renderização para PiP Canvas (Mobile / Fallback)
         function renderPipCanvas(data) {
             if (!pipCtx) return;
             const { currentMap, timerText, nextMap, rebirthText, isRebirthActive, clockText } = data;
 
-            // Fundo escuro com gradiente gamer
+            // Fundo escuro discreto com gradiente gamer
             const bgGrad = pipCtx.createLinearGradient(0, 0, 480, 270);
-            bgGrad.addColorStop(0, '#0a0a14');
-            bgGrad.addColorStop(1, '#141424');
+            bgGrad.addColorStop(0, '#090912');
+            bgGrad.addColorStop(1, '#131322');
             pipCtx.fillStyle = bgGrad;
             pipCtx.fillRect(0, 0, 480, 270);
 
-            // Borda superior neon
+            // Borda superior sutil
             pipCtx.fillStyle = isRebirthActive ? '#00ff7f' : '#ff6b00';
-            pipCtx.fillRect(0, 0, 480, 5);
+            pipCtx.fillRect(0, 0, 480, 4);
 
             // Cabeçalho: Marca e Relógio
-            pipCtx.font = 'bold 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            pipCtx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
             pipCtx.fillStyle = '#ff6b00';
             pipCtx.textAlign = 'left';
-            pipCtx.fillText('WARZONE RESSURGÊNCIA', 22, 34);
+            pipCtx.fillText('WARZONE RESSURGÊNCIA', 20, 32);
 
-            pipCtx.fillStyle = '#9ba1b0';
-            pipCtx.font = '13px monospace';
+            pipCtx.fillStyle = '#888899';
+            pipCtx.font = '12px monospace';
             pipCtx.textAlign = 'right';
-            pipCtx.fillText(clockText, 458, 34);
+            pipCtx.fillText(clockText, 460, 32);
             pipCtx.textAlign = 'left';
 
-            // Linha divisória sutil
-            pipCtx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            // Linha divisória
+            pipCtx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
             pipCtx.lineWidth = 1;
             pipCtx.beginPath();
-            pipCtx.moveTo(22, 44);
-            pipCtx.lineTo(458, 44);
+            pipCtx.moveTo(20, 42);
+            pipCtx.lineTo(460, 42);
             pipCtx.stroke();
 
-            // Rótulo Mapa Atual
-            pipCtx.font = 'bold 12px sans-serif';
-            pipCtx.fillStyle = '#9ba1b0';
-            pipCtx.fillText('MAPA ATUAL', 22, 70);
+            // Mapa Atual
+            pipCtx.font = 'bold 11px sans-serif';
+            pipCtx.fillStyle = '#888899';
+            pipCtx.fillText('MAPA ATUAL', 20, 68);
 
-            // Nome do mapa em destaque
-            pipCtx.font = '900 28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            pipCtx.font = '900 27px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
             pipCtx.fillStyle = '#ffffff';
-            pipCtx.fillText(currentMap.toUpperCase(), 22, 102);
+            pipCtx.fillText(currentMap.toUpperCase(), 20, 100);
 
-            // Timer grande de altíssima legibilidade
-            pipCtx.font = '900 68px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
-            pipCtx.fillStyle = isRebirthActive ? '#00ff7f' : '#ffffff';
-            pipCtx.fillText(timerText, 22, 175);
+            // Timer
+            pipCtx.font = '900 66px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+            pipCtx.fillStyle = isRebirthActive ? '#00ff7f' : '#ff6b00';
+            pipCtx.fillText(timerText, 20, 172);
 
-            // Badge Rebirth Island
+            // Status Rebirth
             if (isRebirthActive) {
-                pipCtx.fillStyle = 'rgba(0, 255, 127, 0.2)';
-                pipCtx.fillRect(22, 188, 170, 26);
-                pipCtx.strokeStyle = '#00ff7f';
-                pipCtx.lineWidth = 1.5;
-                pipCtx.strokeRect(22, 188, 170, 26);
-
                 pipCtx.font = 'bold 13px sans-serif';
                 pipCtx.fillStyle = '#00ff7f';
-                pipCtx.fillText('★ REBIRTH ATIVO', 38, 206);
+                pipCtx.fillText('★ REBIRTH ISLAND ATIVO AGORA', 20, 204);
             } else {
-                pipCtx.font = 'bold 14px sans-serif';
-                pipCtx.fillStyle = '#8a2be2';
-                pipCtx.fillText(`Rebirth Island em: ${rebirthText}`, 22, 204);
+                pipCtx.font = 'bold 13px sans-serif';
+                pipCtx.fillStyle = '#a855f7';
+                pipCtx.fillText(`Rebirth Island em: ${rebirthText}`, 20, 204);
             }
 
-            // Rodapé: Próximo mapa
-            pipCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            pipCtx.fillRect(0, 225, 480, 45);
+            // Rodapé
+            pipCtx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+            pipCtx.fillRect(0, 226, 480, 44);
 
-            pipCtx.font = '13px sans-serif';
-            pipCtx.fillStyle = '#9ba1b0';
-            pipCtx.fillText('PRÓXIMO MAPA:', 22, 253);
+            pipCtx.font = '12px sans-serif';
+            pipCtx.fillStyle = '#888899';
+            pipCtx.fillText('A SEGUIR:', 20, 253);
 
-            pipCtx.font = 'bold 14px sans-serif';
-            pipCtx.fillStyle = '#ff6b00';
-            pipCtx.fillText(nextMap.toUpperCase(), 142, 253);
+            pipCtx.font = 'bold 13px sans-serif';
+            pipCtx.fillStyle = '#ffffff';
+            pipCtx.fillText(nextMap.toUpperCase(), 85, 253);
+        }
+
+        // Renderização para Document PiP (Exclusivo PC: Super discreto e nítido)
+        function updateDesktopPipWindow(data) {
+            if (!desktopPipWindow || desktopPipWindow.closed) return;
+            const { currentMap, timerText, nextMap, rebirthText, isRebirthActive, clockText } = data;
+
+            const doc = desktopPipWindow.document;
+            const mapEl = doc.getElementById('hud-map');
+            const timerEl = doc.getElementById('hud-timer');
+            const clockEl = doc.getElementById('hud-clock');
+            const nextEl = doc.getElementById('hud-next');
+            const rebEl = doc.getElementById('hud-reb');
+
+            if (mapEl) mapEl.innerText = currentMap;
+            if (timerEl) {
+                timerEl.innerText = timerText;
+                if (isRebirthActive) {
+                    timerEl.classList.add('reb-green');
+                } else {
+                    timerEl.classList.remove('reb-green');
+                }
+            }
+            if (clockEl) clockEl.innerText = clockText;
+            if (nextEl) nextEl.innerText = nextMap;
+            if (rebEl) {
+                if (isRebirthActive) {
+                    rebEl.innerText = "★ REBIRTH ATIVO";
+                    rebEl.classList.add('active');
+                } else {
+                    rebEl.innerText = `Rebirth: ${rebirthText}`;
+                    rebEl.classList.remove('active');
+                }
+            }
         }
 
         async function togglePictureInPicture() {
-            if (document.pictureInPictureElement) {
-                try {
-                    await document.exitPictureInPicture();
-                } catch (e) {
-                    console.warn(e);
-                }
+            // 1. Se a janela de PC (Document PiP) já estiver aberta, fechar
+            if (desktopPipWindow && !desktopPipWindow.closed) {
+                desktopPipWindow.close();
+                desktopPipWindow = null;
+                setPipActiveState(false);
                 return;
             }
 
+            // 2. Se o PiP de vídeo nativo já estiver aberto, sair
+            if (document.pictureInPictureElement) {
+                try {
+                    await document.exitPictureInPicture();
+                } catch (e) {}
+                setPipActiveState(false);
+                return;
+            }
+
+            // 3. PC Desktop: Usa Document Picture-in-Picture (Ultra discreto, 320x165 px)
+            if ('documentPictureInPicture' in window) {
+                try {
+                    desktopPipWindow = await window.documentPictureInPicture.requestWindow({
+                        width: 320,
+                        height: 165
+                    });
+
+                    desktopPipWindow.document.body.innerHTML = `
+                        <div class="hud-box">
+                            <div class="hud-header">
+                                <span class="hud-tag">WZ RESSURGÊNCIA</span>
+                                <span class="hud-clock" id="hud-clock">00:00:00</span>
+                            </div>
+                            <div class="hud-main">
+                                <div class="hud-map" id="hud-map">...</div>
+                                <div class="hud-timer" id="hud-timer">00:00</div>
+                            </div>
+                            <div class="hud-footer">
+                                <div>A Seguir: <b id="hud-next">...</b></div>
+                                <div class="hud-reb" id="hud-reb">Rebirth: ...</div>
+                            </div>
+                        </div>
+                    `;
+
+                    const styleEl = desktopPipWindow.document.createElement('style');
+                    styleEl.textContent = `
+                        * { box-sizing: border-box; margin: 0; padding: 0; }
+                        body {
+                            background-color: #0b0b12;
+                            color: #f3f4f8;
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                            height: 100vh;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 10px 12px;
+                            user-select: none;
+                            overflow: hidden;
+                        }
+                        .hud-box {
+                            width: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 6px;
+                            background: rgba(18, 18, 28, 0.95);
+                            border: 1px solid rgba(255, 107, 0, 0.35);
+                            border-radius: 10px;
+                            padding: 8px 12px;
+                        }
+                        .hud-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            font-size: 0.64rem;
+                            font-weight: 800;
+                            letter-spacing: 1px;
+                        }
+                        .hud-tag { color: #ff6b00; }
+                        .hud-clock { color: #888899; font-family: monospace; }
+                        .hud-main {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: baseline;
+                            gap: 8px;
+                            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                            padding-bottom: 4px;
+                        }
+                        .hud-map {
+                            font-size: 1.05rem;
+                            font-weight: 900;
+                            text-transform: uppercase;
+                            color: #ffffff;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                        .hud-timer {
+                            font-family: ui-monospace, SFMono-Regular, monospace;
+                            font-size: 1.75rem;
+                            font-weight: 900;
+                            color: #ff6b00;
+                            letter-spacing: 1px;
+                            line-height: 1;
+                        }
+                        .hud-timer.reb-green { color: #00ff7f; text-shadow: 0 0 10px rgba(0, 255, 127, 0.4); }
+                        .hud-footer {
+                            display: flex;
+                            justify-content: space-between;
+                            font-size: 0.68rem;
+                            color: #9ba1b0;
+                        }
+                        .hud-footer b { color: #ffffff; }
+                        .hud-reb { color: #a855f7; font-weight: 700; }
+                        .hud-reb.active { color: #00ff7f; }
+                    `;
+                    desktopPipWindow.document.head.appendChild(styleEl);
+
+                    desktopPipWindow.addEventListener('pagehide', () => {
+                        desktopPipWindow = null;
+                        setPipActiveState(false);
+                    });
+
+                    setPipActiveState(true);
+                    updateDesktopPipWindow({
+                        currentMap: document.getElementById('current-map').innerText,
+                        timerText: document.getElementById('current-timer').innerText,
+                        nextMap: document.getElementById('next-map').innerText,
+                        rebirthText: document.getElementById('rebirth-timer').innerText,
+                        isRebirthActive: document.getElementById('rebirth-timer').classList.contains('rebirth-status-active'),
+                        clockText: document.getElementById('local-clock').innerText
+                    });
+                    return;
+                } catch (e) {
+                    console.warn("Document PiP não abriu, tentando Video PiP:", e);
+                }
+            }
+
+            // 4. Celular / Fallback: Canvas Video Picture-in-Picture
             try {
                 if (!pipStream) {
                     pipStream = pipCanvas.captureStream(10);
@@ -1120,30 +1281,15 @@
                 await pipVideo.play();
                 await pipVideo.requestPictureInPicture();
             } catch (err) {
-                console.warn("PiP não suportado ou negado:", err);
-                alert("Picture-in-Picture não suportado diretamente neste navegador. Ativando o Mini Pop-up na tela!");
-                toggleInPagePopup(true);
+                console.warn("PiP não suportado:", err);
+                alert("O seu navegador não suporta a janela flutuante sobreposta (Picture-in-Picture).");
             }
         }
 
-        pipVideo.addEventListener('enterpictureinpicture', () => {
-            pipBtn.classList.add('active');
-            pipText.innerText = "Pop-up Ativo";
-        });
-
-        pipVideo.addEventListener('leavepictureinpicture', () => {
-            pipBtn.classList.remove('active');
-            pipText.innerText = "Pop-up Sobreposto";
-        });
+        pipVideo.addEventListener('enterpictureinpicture', () => setPipActiveState(true));
+        pipVideo.addEventListener('leavepictureinpicture', () => setPipActiveState(false));
 
         pipBtn.addEventListener('click', togglePictureInPicture);
-
-        // ==========================================
-        // MINI POP-UP FLUTUANTE NA TELA (IN-PAGE)
-        // ==========================================
-        const miniPopupEl = document.getElementById('in-page-popup');
-        const miniPopupBtn = document.getElementById('mini-popup-btn');
-        const closePopupBtn = document.getElementById('close-popup-btn');
 
         // Dropdown Accordion Toggle
         const headerDropdown = document.getElementById('header-dropdown');
@@ -1155,98 +1301,6 @@
             });
         }
 
-        function toggleInPagePopup(forceOpen = null) {
-            const isCurrentlyOpen = (miniPopupEl.style.display !== 'none');
-            const shouldOpen = forceOpen !== null ? forceOpen : !isCurrentlyOpen;
-            if (shouldOpen) {
-                miniPopupEl.style.display = 'block';
-                miniPopupBtn.classList.add('active');
-
-                // Sincroniza imediatamente com os dados da tela para nunca exibir "Carregando"
-                const currentMapName = document.getElementById('current-map').innerText;
-                const currentTimer = document.getElementById('current-timer').innerText;
-                const nextMapName = document.getElementById('next-map').innerText;
-                const isRebirth = document.getElementById('rebirth-timer').classList.contains('rebirth-status-active');
-
-                updateInPagePopup({
-                    currentMap: currentMapName || 'Carregando...',
-                    timerText: currentTimer || '00:00',
-                    nextMap: nextMapName || '...',
-                    isRebirthActive: isRebirth
-                });
-            } else {
-                miniPopupEl.style.display = 'none';
-                miniPopupBtn.classList.remove('active');
-            }
-        }
-
-        function updateInPagePopup(data) {
-            if (miniPopupEl.style.display === 'none') return;
-            const { currentMap, timerText, nextMap, isRebirthActive } = data;
-
-            document.getElementById('popup-map-name').innerText = currentMap;
-            document.getElementById('popup-timer').innerText = timerText;
-            document.getElementById('popup-next-map').innerText = nextMap;
-
-            if (isRebirthActive) {
-                miniPopupEl.classList.add('rebirth-active');
-                document.getElementById('popup-pill').innerText = "★ REBIRTH ATIVO";
-            } else {
-                miniPopupEl.classList.remove('rebirth-active');
-                document.getElementById('popup-pill').innerText = "● ROTAÇÃO";
-            }
-        }
-
-        miniPopupBtn.addEventListener('click', () => toggleInPagePopup());
-        closePopupBtn.addEventListener('click', () => toggleInPagePopup(false));
-
-        // Sistema de arrastar (Drag & Drop) para o Mini Pop-up (Mouse e Touch)
-        let isDraggingPopup = false;
-        let dragStartX = 0, dragStartY = 0;
-        let popupInitialX = 0, popupInitialY = 0;
-
-        function onDragStart(e) {
-            if (e.target.closest('#close-popup-btn')) return;
-            isDraggingPopup = true;
-            const pt = e.touches ? e.touches[0] : e;
-            dragStartX = pt.clientX;
-            dragStartY = pt.clientY;
-            const rect = miniPopupEl.getBoundingClientRect();
-            popupInitialX = rect.left;
-            popupInitialY = rect.top;
-
-            miniPopupEl.style.bottom = 'auto';
-            miniPopupEl.style.right = 'auto';
-            miniPopupEl.style.left = `${popupInitialX}px`;
-            miniPopupEl.style.top = `${popupInitialY}px`;
-        }
-
-        function onDragMove(e) {
-            if (!isDraggingPopup) return;
-            const pt = e.touches ? e.touches[0] : e;
-            const dx = pt.clientX - dragStartX;
-            const dy = pt.clientY - dragStartY;
-
-            const maxX = window.innerWidth - miniPopupEl.offsetWidth - 12;
-            const maxY = window.innerHeight - miniPopupEl.offsetHeight - 12;
-            const newX = Math.max(12, Math.min(maxX, popupInitialX + dx));
-            const newY = Math.max(12, Math.min(maxY, popupInitialY + dy));
-
-            miniPopupEl.style.left = `${newX}px`;
-            miniPopupEl.style.top = `${newY}px`;
-        }
-
-        function onDragEnd() {
-            isDraggingPopup = false;
-        }
-
-        miniPopupEl.addEventListener('touchstart', onDragStart, { passive: true });
-        window.addEventListener('touchmove', onDragMove, { passive: true });
-        window.addEventListener('touchend', onDragEnd, { passive: true });
-
-        miniPopupEl.addEventListener('mousedown', onDragStart);
-        window.addEventListener('mousemove', onDragMove);
-        window.addEventListener('mouseup', onDragEnd);
 
         // Inicialização
         requestScreenWakeLock();
