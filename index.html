@@ -116,18 +116,104 @@
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
         }
 
-        /* Barra de Controle: Fuso Horário e Status de Tela Ativa */
+        /* Barra de Controle Retrátil (Dropdown): Fuso, Relógio e Ações */
         .header-panel {
             background: var(--panel-bg);
             border: 1px solid var(--border-subtle);
             border-radius: 14px;
-            padding: 12px 14px;
+            padding: 6px 10px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
+            transition: all 0.25s ease;
+            overflow: hidden;
+        }
+
+        .dropdown-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 6px 4px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 700;
+            outline: none;
+            user-select: none;
+        }
+
+        .toggle-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-icon {
+            font-size: 0.95rem;
+        }
+
+        .compact-clock {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            background: rgba(0, 0, 0, 0.55);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 107, 0, 0.3);
+            margin-left: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .toggle-action {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .toggle-arrow {
+            font-size: 0.72rem;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+        }
+
+        .header-panel.open .toggle-arrow {
+            transform: rotate(180deg);
+            color: var(--accent-orange);
+        }
+
+        .dropdown-menu-content {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px 2px 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            animation: expandDown 0.2s ease forwards;
+        }
+
+        .header-panel.open .dropdown-menu-content {
+            display: flex;
+        }
+
+        @keyframes expandDown {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .timezone-selector {
@@ -555,50 +641,58 @@
             <h1 class="brand-title">WZ Ressurgência Timer</h1>
         </div>
 
-        <!-- Seletor de Fuso Horário, Relógio e Wake Lock -->
-        <header class="header-panel">
-            <div class="timezone-selector">
-                <div class="timezone-select-group">
-                    <label for="tz">Fuso:</label>
-                    <select id="tz">
-                        <!-- Fusos do Brasil (Cobertura Completa) -->
-                        <optgroup label="Brasil (Todos os Fusos)">
-                            <option value="America/Sao_Paulo" selected>Brasília / SP / RJ / Sul / Nordeste (UTC-3)</option>
-                            <option value="America/Manaus">Manaus / AM / RO / RR (UTC-4)</option>
-                            <option value="America/Cuiaba">Cuiabá / MT / MS (UTC-4)</option>
-                            <option value="America/Belem">Belém / PA / AP (UTC-3)</option>
-                            <option value="America/Rio_Branco">Acre / Rio Branco (UTC-5)</option>
-                            <option value="America/Noronha">Fernando de Noronha (UTC-2)</option>
-                        </optgroup>
-                        <!-- Fusos Internacionais -->
-                        <optgroup label="Internacional">
-                            <option value="UTC">UTC (Global)</option>
-                            <option value="America/New_York">Nova York (UTC-5/UTC-4)</option>
-                            <option value="Europe/Lisbon">Lisboa / Portugal (UTC+0/UTC+1)</option>
-                            <option value="Europe/London">Londres (UTC+0/UTC+1)</option>
-                        </optgroup>
-                    </select>
+        <!-- Barra de Controle Retrátil (Dropdown): Fuso, Relógio e Ações -->
+        <header class="header-panel" id="header-dropdown">
+            <button class="dropdown-toggle" id="dropdown-toggle" type="button" aria-expanded="false" title="Toque para expandir/recolher ajustes e fuso horário">
+                <div class="toggle-info">
+                    <span class="toggle-icon">⚙️</span>
+                    <span>Ajustes & Fuso</span>
+                    <span class="compact-clock" id="header-compact-clock">00:00:00</span>
                 </div>
-                <div class="clock-display" id="local-clock">00:00:00</div>
-            </div>
+                <div class="toggle-action">
+                    <span class="toggle-arrow" id="dropdown-arrow">▼</span>
+                </div>
+            </button>
 
-            <!-- Controles Rápidos: Tela Ativa e Pop-ups -->
-            <div class="header-actions">
-                <button class="action-btn wake-lock-status" id="wake-lock-btn" type="button" title="Clique para ativar/desativar tela sempre ligada">
-                    <span class="wake-lock-dot"></span>
-                    <span id="wake-lock-text">Tela sempre ativa: Ativando...</span>
-                </button>
-                <div class="action-row">
-                    <!-- Botão de Janela Flutuante Sobreposta no Celular / PiP -->
-                    <button class="action-btn pip-btn" id="pip-btn" type="button" title="Ativar pop-up flutuante que fica sobreposto a outros apps no celular">
-                        <span>🗔</span>
-                        <span id="pip-text">Pop-up Sobreposto</span>
+            <div class="dropdown-menu-content" id="dropdown-content">
+                <div class="timezone-selector">
+                    <div class="timezone-select-group">
+                        <label for="tz">Fuso:</label>
+                        <select id="tz">
+                            <optgroup label="Brasil (Todos os Fusos)">
+                                <option value="America/Sao_Paulo" selected>Brasília / SP / RJ / Sul / Nordeste (UTC-3)</option>
+                                <option value="America/Manaus">Manaus / AM / RO / RR (UTC-4)</option>
+                                <option value="America/Cuiaba">Cuiabá / MT / MS (UTC-4)</option>
+                                <option value="America/Belem">Belém / PA / AP (UTC-3)</option>
+                                <option value="America/Rio_Branco">Acre / Rio Branco (UTC-5)</option>
+                                <option value="America/Noronha">Fernando de Noronha (UTC-2)</option>
+                            </optgroup>
+                            <optgroup label="Internacional">
+                                <option value="UTC">UTC (Global)</option>
+                                <option value="America/New_York">Nova York (UTC-5/UTC-4)</option>
+                                <option value="Europe/Lisbon">Lisboa / Portugal (UTC+0/UTC+1)</option>
+                                <option value="Europe/London">Londres (UTC+0/UTC+1)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="clock-display" id="local-clock">00:00:00</div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="action-btn wake-lock-status" id="wake-lock-btn" type="button" title="Clique para ativar/desativar tela sempre ligada">
+                        <span class="wake-lock-dot"></span>
+                        <span id="wake-lock-text">Tela sempre ativa: Ativando...</span>
                     </button>
-                    <!-- Botão de Mini Pop-up na Tela -->
-                    <button class="action-btn mini-popup-btn" id="mini-popup-btn" type="button" title="Fixar mini widget flutuante e arrastável na tela">
-                        <span>📌</span>
-                        <span id="mini-popup-text">Mini Pop-up</span>
-                    </button>
+                    <div class="action-row">
+                        <button class="action-btn pip-btn" id="pip-btn" type="button" title="Ativar pop-up flutuante sobreposto (PiP)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><rect x="12" y="8" width="8" height="6" rx="1"/></svg>
+                            <span id="pip-text">Pop-up Sobreposto</span>
+                        </button>
+                        <button class="action-btn mini-popup-btn" id="mini-popup-btn" type="button" title="Fixar mini card flutuante nesta tela">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10m-4-6h8M7 16l5 6 5-6H7z"/></svg>
+                            <span id="mini-popup-text">Mini Pop-up</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -755,7 +849,11 @@
             
             applyCardBackground('rebirth-block', rebirthImg);
 
-            if (currentMapIndex === rebirthIndex) {
+            const isRebirth = (currentMapIndex === rebirthIndex);
+            let msUntilRebirth = 0;
+            let rebirthTextVal = "ATIVO AGORA";
+
+            if (isRebirth) {
                 rebirthTimerEl.innerText = "ATIVO AGORA";
                 rebirthTimerEl.classList.add('rebirth-status-active');
             } else {
@@ -763,29 +861,28 @@
                 
                 // Distância em blocos até o Rebirth
                 const blocksUntilRebirth = (rebirthIndex - currentMapIndex + maps.length) % maps.length;
-                const msUntilRebirth = msRemainingInBlock + ((blocksUntilRebirth - 1) * DURATION_MS);
-                
-                rebirthTimerEl.innerText = formatTime(msUntilRebirth);
+                msUntilRebirth = msRemainingInBlock + ((blocksUntilRebirth - 1) * DURATION_MS);
+                rebirthTextVal = formatTime(msUntilRebirth);
+                rebirthTimerEl.innerText = rebirthTextVal;
             }
 
             // 4. Atualizar Relógio Local
             updateClock();
 
             // 5. Atualizar Pop-up Sobreposto (PiP Canvas) e Mini Pop-up na Tela
-            const isRebirth = (currentMapIndex === rebirthIndex);
-            const rebirthTextVal = isRebirth ? "ATIVO AGORA" : formatTime(msRemainingInBlock + ((blocksUntilRebirth - 1) * DURATION_MS));
+            const currentTimerFormatted = formatTime(msRemainingInBlock);
             const clockTextVal = document.getElementById('local-clock').innerText || "";
 
             updateInPagePopup({
                 currentMap: currentMapObj.name,
-                timerText: formatTime(msRemainingInBlock),
+                timerText: currentTimerFormatted,
                 nextMap: nextMapObj.name,
                 isRebirthActive: isRebirth
             });
 
             renderPipCanvas({
                 currentMap: currentMapObj.name,
-                timerText: formatTime(msRemainingInBlock),
+                timerText: currentTimerFormatted,
                 nextMap: nextMapObj.name,
                 rebirthText: rebirthTextVal,
                 isRebirthActive: isRebirth,
@@ -795,11 +892,16 @@
 
         function updateClock() {
             const tz = document.getElementById('tz').value;
+            let timeString = '';
             try {
-                const timeString = new Date().toLocaleTimeString('pt-BR', { timeZone: tz });
-                document.getElementById('local-clock').innerText = timeString;
+                timeString = new Date().toLocaleTimeString('pt-BR', { timeZone: tz });
             } catch (e) {
-                document.getElementById('local-clock').innerText = new Date().toLocaleTimeString('pt-BR');
+                timeString = new Date().toLocaleTimeString('pt-BR');
+            }
+            document.getElementById('local-clock').innerText = timeString;
+            const compactClockEl = document.getElementById('header-compact-clock');
+            if (compactClockEl) {
+                compactClockEl.innerText = timeString;
             }
         }
 
@@ -1043,11 +1145,35 @@
         const miniPopupBtn = document.getElementById('mini-popup-btn');
         const closePopupBtn = document.getElementById('close-popup-btn');
 
+        // Dropdown Accordion Toggle
+        const headerDropdown = document.getElementById('header-dropdown');
+        const dropdownToggleBtn = document.getElementById('dropdown-toggle');
+        if (dropdownToggleBtn && headerDropdown) {
+            dropdownToggleBtn.addEventListener('click', () => {
+                const isOpen = headerDropdown.classList.toggle('open');
+                dropdownToggleBtn.setAttribute('aria-expanded', isOpen);
+            });
+        }
+
         function toggleInPagePopup(forceOpen = null) {
-            const shouldOpen = forceOpen !== null ? forceOpen : (miniPopupEl.style.display === 'none');
+            const isCurrentlyOpen = (miniPopupEl.style.display !== 'none');
+            const shouldOpen = forceOpen !== null ? forceOpen : !isCurrentlyOpen;
             if (shouldOpen) {
                 miniPopupEl.style.display = 'block';
                 miniPopupBtn.classList.add('active');
+
+                // Sincroniza imediatamente com os dados da tela para nunca exibir "Carregando"
+                const currentMapName = document.getElementById('current-map').innerText;
+                const currentTimer = document.getElementById('current-timer').innerText;
+                const nextMapName = document.getElementById('next-map').innerText;
+                const isRebirth = document.getElementById('rebirth-timer').classList.contains('rebirth-status-active');
+
+                updateInPagePopup({
+                    currentMap: currentMapName || 'Carregando...',
+                    timerText: currentTimer || '00:00',
+                    nextMap: nextMapName || '...',
+                    isRebirthActive: isRebirth
+                });
             } else {
                 miniPopupEl.style.display = 'none';
                 miniPopupBtn.classList.remove('active');
