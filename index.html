@@ -991,8 +991,9 @@
 
         // ==========================================
         // POP-UP SOBREPOSTO (PICTURE-IN-PICTURE)
-        // PC: janela compacta (Document PiP) no canto inferior direito
-        // Celular: Video PiP nítido (alta resolução, proporção aceita pelo Android)
+        // Video PiP em todos os dispositivos: janela limpa, SEM barra de
+        // navegador/endereço, mostrando só o nome do mapa e o tempo.
+        // (Document PiP fica apenas como último recurso)
         // ==========================================
         const isTouchDevice = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
         const DESKTOP_PIP_W = 300;
@@ -1004,7 +1005,8 @@
         // renderizado em 3x para ficar nítido quando o sistema amplia a janela
         const PIP_LOGICAL_W = 239;
         const PIP_LOGICAL_H = 100;
-        const PIP_SCALE = 3;
+        // Celular: 3x (nitidez quando ampliado) • PC: 2x (janela nasce pequena)
+        const PIP_SCALE = isTouchDevice ? 3 : 2;
         const pipCanvas = document.createElement('canvas');
         pipCanvas.width = PIP_LOGICAL_W * PIP_SCALE;
         pipCanvas.height = PIP_LOGICAL_H * PIP_SCALE;
@@ -1215,14 +1217,11 @@
             const canDocPip = 'documentPictureInPicture' in window;
             const canVideoPip = !!document.pictureInPictureEnabled && typeof pipVideo.requestPictureInPicture === 'function';
 
-            // PC: janela compacta
-            if (canDocPip && !isTouchDevice) {
-                try { await openDesktopPip(); return; } catch (e) { console.warn('Document PiP falhou:', e); }
-            }
-            // Celular (ou fallback): Video PiP
+            // 1. Video PiP (PC e celular): sem barra de navegador
             if (canVideoPip) {
                 try { await openVideoPip(); return; } catch (e) { console.warn('Video PiP falhou:', e); }
             }
+            // 2. Último recurso: Document PiP (o navegador exibe barra de título)
             if (canDocPip) {
                 try { await openDesktopPip(); return; } catch (e) { console.warn('Document PiP falhou:', e); }
             }
