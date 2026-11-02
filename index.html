@@ -365,6 +365,104 @@
             width: 100%;
         }
 
+                /* Botão Alternar Modo Mini HUD */
+        .hud-mode-btn {
+            color: #d1d5db;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .hud-mode-btn:hover {
+            background: rgba(255, 107, 0, 0.15);
+            border-color: var(--accent-orange);
+            color: #ffffff;
+        }
+
+        /* ESTILO DO MODO MINI HUD (QUANDO ATIVADO NO PC / NAVEGADOR) */
+        body.mini-hud-active {
+            padding: 8px !important;
+            justify-content: center !important;
+            align-items: center !important;
+            min-height: 100vh !important;
+            background: #07070c !important;
+            overflow: hidden !important;
+        }
+
+        body.mini-hud-active .global-bg,
+        body.mini-hud-active .global-overlay,
+        body.mini-hud-active .brand-header,
+        body.mini-hud-active .header-panel,
+        body.mini-hud-active .side-blocks,
+        body.mini-hud-active .footer-note {
+            display: none !important;
+        }
+
+        body.mini-hud-active .container {
+            max-width: 320px !important;
+            margin: 0 !important;
+            gap: 0 !important;
+        }
+
+        body.mini-hud-active .dashboard-grid {
+            display: block !important;
+        }
+
+        body.mini-hud-active .current-map-card {
+            padding: 10px 14px !important;
+            border-radius: 10px !important;
+            border: 1px solid var(--accent-orange) !important;
+            background: rgba(14, 14, 22, 0.98) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9) !important;
+            position: relative !important;
+        }
+
+        body.mini-hud-active .current-map-card .label {
+            display: none !important;
+        }
+
+        body.mini-hud-active .current-map-card .map-name {
+            font-size: 1.1rem !important;
+            margin-bottom: 2px !important;
+            text-align: left !important;
+        }
+
+        body.mini-hud-active .current-map-card .timer-display {
+            font-size: 1.8rem !important;
+            padding: 2px 8px !important;
+            position: absolute !important;
+            right: 12px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: var(--accent-orange) !important;
+        }
+
+        body.mini-hud-active .mini-hud-exit-btn {
+            display: flex !important;
+        }
+
+        .mini-hud-exit-btn {
+            display: none;
+            position: fixed;
+            top: 4px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #9ba1b0;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            cursor: pointer;
+            z-index: 9999;
+        }
+
+        .mini-hud-exit-btn:hover {
+            color: #ffffff;
+            border-color: var(--accent-orange);
+        }
+
         /* ==========================================
            VERSÃO DISCRETA E ELEGANTE PARA PC (DESKTOP)
            ========================================== */
@@ -629,6 +727,7 @@
     </style>
 </head>
 <body>
+    <button type="button" class="mini-hud-exit-btn" id="mini-hud-exit-btn" title="Sair do modo Mini HUD">✕ Restaurar Visão Completa</button>
 
     <!-- Fundo de Tela Dinâmico -->
     <div class="global-bg" id="global-bg"></div>
@@ -684,11 +783,15 @@
                             <span class="wake-lock-dot"></span>
                             <span id="wake-lock-text">Tela sempre ativa</span>
                         </button>
-                        <button class="action-btn pip-btn" id="pip-btn" type="button" title="Ativar pop-up flutuante sobreposto (Picture-in-Picture)">
+                        <button class="action-btn pip-btn" id="pip-btn" type="button" title="Ativar pop-up flutuante nativo (sem barras de navegador)">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><rect x="12" y="8" width="8" height="6" rx="1"/></svg>
                             <span id="pip-text">Pop-up Sobreposto</span>
                         </button>
                     </div>
+                    <button class="action-btn hud-mode-btn" id="hud-mode-btn" type="button" title="Alternar janela para mini HUD compacto para não atrapalhar no jogo">
+                        <span>🎮</span>
+                        <span id="hud-mode-text">Modo Mini HUD (Discreto)</span>
+                    </button>
                 </div>
             </div>
         </header>
@@ -990,15 +1093,16 @@
 
 
         // ==========================================
-        // POP-UP SOBREPOSTO (PICTURE-IN-PICTURE)
-        // Versão Discreta para PC (Document PiP) & Celular (Canvas PiP)
+        // POP-UP SOBREPOSTO ULTRA-DISCRETO (PICTURE-IN-PICTURE)
+        // Sem barras de navegador • Proporção slim 320x70 px
         // ==========================================
         let desktopPipWindow = null;
         let pipStream = null;
 
+        // Canvas slim horizontal (4.5 : 1) para janela flutuante fina e discreta
         const pipCanvas = document.createElement('canvas');
-        pipCanvas.width = 480;
-        pipCanvas.height = 270;
+        pipCanvas.width = 320;
+        pipCanvas.height = 70;
         const pipCtx = pipCanvas.getContext('2d');
 
         const pipVideo = document.createElement('video');
@@ -1028,91 +1132,57 @@
             }
         }
 
-        // Renderização para PiP Canvas (Mobile / Fallback)
+        // Renderização do Canvas para Video PiP (100% livre de barras de navegador)
         function renderPipCanvas(data) {
             if (!pipCtx) return;
-            const { currentMap, timerText, nextMap, rebirthText, isRebirthActive, clockText } = data;
+            const { currentMap, timerText, nextMap, rebirthText, isRebirthActive } = data;
 
-            // Fundo escuro discreto com gradiente gamer
-            const bgGrad = pipCtx.createLinearGradient(0, 0, 480, 270);
-            bgGrad.addColorStop(0, '#090912');
-            bgGrad.addColorStop(1, '#131322');
-            pipCtx.fillStyle = bgGrad;
-            pipCtx.fillRect(0, 0, 480, 270);
+            // Fundo escuro discreto
+            pipCtx.fillStyle = '#08080d';
+            pipCtx.fillRect(0, 0, 320, 70);
 
-            // Borda superior sutil
-            pipCtx.fillStyle = isRebirthActive ? '#00ff7f' : '#ff6b00';
-            pipCtx.fillRect(0, 0, 480, 4);
-
-            // Cabeçalho: Marca e Relógio
-            pipCtx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-            pipCtx.fillStyle = '#ff6b00';
-            pipCtx.textAlign = 'left';
-            pipCtx.fillText('WARZONE RESSURGÊNCIA', 20, 32);
-
-            pipCtx.fillStyle = '#888899';
-            pipCtx.font = '12px monospace';
-            pipCtx.textAlign = 'right';
-            pipCtx.fillText(clockText, 460, 32);
-            pipCtx.textAlign = 'left';
-
-            // Linha divisória
-            pipCtx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            // Borda fina discreta
+            pipCtx.strokeStyle = isRebirthActive ? 'rgba(0, 255, 127, 0.45)' : 'rgba(255, 107, 0, 0.35)';
             pipCtx.lineWidth = 1;
-            pipCtx.beginPath();
-            pipCtx.moveTo(20, 42);
-            pipCtx.lineTo(460, 42);
-            pipCtx.stroke();
+            pipCtx.strokeRect(0, 0, 320, 70);
 
-            // Mapa Atual
-            pipCtx.font = 'bold 11px sans-serif';
-            pipCtx.fillStyle = '#888899';
-            pipCtx.fillText('MAPA ATUAL', 20, 68);
-
-            pipCtx.font = '900 27px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-            pipCtx.fillStyle = '#ffffff';
-            pipCtx.fillText(currentMap.toUpperCase(), 20, 100);
-
-            // Timer
-            pipCtx.font = '900 66px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+            // Faixa neon lateral de 4px
             pipCtx.fillStyle = isRebirthActive ? '#00ff7f' : '#ff6b00';
-            pipCtx.fillText(timerText, 20, 172);
+            pipCtx.fillRect(0, 0, 4, 70);
 
-            // Status Rebirth
-            if (isRebirthActive) {
-                pipCtx.font = 'bold 13px sans-serif';
-                pipCtx.fillStyle = '#00ff7f';
-                pipCtx.fillText('★ REBIRTH ISLAND ATIVO AGORA', 20, 204);
-            } else {
-                pipCtx.font = 'bold 13px sans-serif';
-                pipCtx.fillStyle = '#a855f7';
-                pipCtx.fillText(`Rebirth Island em: ${rebirthText}`, 20, 204);
-            }
-
-            // Rodapé
-            pipCtx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-            pipCtx.fillRect(0, 226, 480, 44);
-
-            pipCtx.font = '12px sans-serif';
-            pipCtx.fillStyle = '#888899';
-            pipCtx.fillText('A SEGUIR:', 20, 253);
-
-            pipCtx.font = 'bold 13px sans-serif';
+            // Nome do Mapa (Linha superior)
+            pipCtx.font = '900 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
             pipCtx.fillStyle = '#ffffff';
-            pipCtx.fillText(nextMap.toUpperCase(), 85, 253);
+            pipCtx.textAlign = 'left';
+            pipCtx.textBaseline = 'middle';
+            pipCtx.fillText(currentMap.toUpperCase(), 14, 25);
+
+            // Timer grande e legível à direita
+            pipCtx.font = '900 34px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+            pipCtx.fillStyle = isRebirthActive ? '#00ff7f' : '#ff6b00';
+            pipCtx.textAlign = 'right';
+            pipCtx.textBaseline = 'middle';
+            pipCtx.fillText(timerText, 308, 35);
+
+            // Linha inferior (Próximo mapa e status de Rebirth)
+            pipCtx.font = '600 11px sans-serif';
+            pipCtx.textAlign = 'left';
+            pipCtx.fillStyle = '#888899';
+            const subLine = isRebirthActive 
+                ? `Próx: ${nextMap} • ★ REBIRTH ATIVO`
+                : `Próx: ${nextMap} • Rebirth: ${rebirthText}`;
+            pipCtx.fillText(subLine, 14, 52);
         }
 
-        // Renderização para Document PiP (Exclusivo PC: Super discreto e nítido)
+        // Fallback Document PiP ultra-compacto caso Video PiP não esteja disponível
         function updateDesktopPipWindow(data) {
             if (!desktopPipWindow || desktopPipWindow.closed) return;
-            const { currentMap, timerText, nextMap, rebirthText, isRebirthActive, clockText } = data;
+            const { currentMap, timerText, nextMap, rebirthText, isRebirthActive } = data;
 
             const doc = desktopPipWindow.document;
             const mapEl = doc.getElementById('hud-map');
             const timerEl = doc.getElementById('hud-timer');
-            const clockEl = doc.getElementById('hud-clock');
-            const nextEl = doc.getElementById('hud-next');
-            const rebEl = doc.getElementById('hud-reb');
+            const subEl = doc.getElementById('hud-sub');
 
             if (mapEl) mapEl.innerText = currentMap;
             if (timerEl) {
@@ -1123,29 +1193,15 @@
                     timerEl.classList.remove('reb-green');
                 }
             }
-            if (clockEl) clockEl.innerText = clockText;
-            if (nextEl) nextEl.innerText = nextMap;
-            if (rebEl) {
-                if (isRebirthActive) {
-                    rebEl.innerText = "★ REBIRTH ATIVO";
-                    rebEl.classList.add('active');
-                } else {
-                    rebEl.innerText = `Rebirth: ${rebirthText}`;
-                    rebEl.classList.remove('active');
-                }
+            if (subEl) {
+                subEl.innerText = isRebirthActive 
+                    ? `Próx: ${nextMap} • ★ REBIRTH ATIVO`
+                    : `Próx: ${nextMap} • Rebirth: ${rebirthText}`;
             }
         }
 
         async function togglePictureInPicture() {
-            // 1. Se a janela de PC (Document PiP) já estiver aberta, fechar
-            if (desktopPipWindow && !desktopPipWindow.closed) {
-                desktopPipWindow.close();
-                desktopPipWindow = null;
-                setPipActiveState(false);
-                return;
-            }
-
-            // 2. Se o PiP de vídeo nativo já estiver aberto, sair
+            // Se Video PiP estiver ativo, sair
             if (document.pictureInPictureElement) {
                 try {
                     await document.exitPictureInPicture();
@@ -1154,28 +1210,51 @@
                 return;
             }
 
-            // 3. PC Desktop: Usa Document Picture-in-Picture (Ultra discreto, 320x165 px)
+            // Se janela Document PiP estiver aberta, fechar
+            if (desktopPipWindow && !desktopPipWindow.closed) {
+                desktopPipWindow.close();
+                desktopPipWindow = null;
+                setPipActiveState(false);
+                return;
+            }
+
+            // 1. TENTA PRIMEIRO O VIDEO PIP NATIVO (100% SEM BARRA DE NAVEGADOR)
+            try {
+                renderPipCanvas({
+                    currentMap: document.getElementById('current-map').innerText,
+                    timerText: document.getElementById('current-timer').innerText,
+                    nextMap: document.getElementById('next-map').innerText,
+                    rebirthText: document.getElementById('rebirth-timer').innerText,
+                    isRebirthActive: document.getElementById('rebirth-timer').classList.contains('rebirth-status-active')
+                });
+
+                if (!pipStream) {
+                    pipStream = pipCanvas.captureStream(10);
+                    pipVideo.srcObject = pipStream;
+                }
+
+                await pipVideo.play();
+                await pipVideo.requestPictureInPicture();
+                return;
+            } catch (err) {
+                console.warn("Video PiP não pôde ser ativado, tentando Document PiP compacto:", err);
+            }
+
+            // 2. FALLBACK: Document PiP ultra-compacto (240x65 px)
             if ('documentPictureInPicture' in window) {
                 try {
                     desktopPipWindow = await window.documentPictureInPicture.requestWindow({
-                        width: 320,
-                        height: 165
+                        width: 240,
+                        height: 65
                     });
 
                     desktopPipWindow.document.body.innerHTML = `
-                        <div class="hud-box">
-                            <div class="hud-header">
-                                <span class="hud-tag">WZ RESSURGÊNCIA</span>
-                                <span class="hud-clock" id="hud-clock">00:00:00</span>
+                        <div class="hud-mini">
+                            <div class="hud-top">
+                                <span class="hud-map" id="hud-map">...</span>
+                                <span class="hud-timer" id="hud-timer">00:00</span>
                             </div>
-                            <div class="hud-main">
-                                <div class="hud-map" id="hud-map">...</div>
-                                <div class="hud-timer" id="hud-timer">00:00</div>
-                            </div>
-                            <div class="hud-footer">
-                                <div>A Seguir: <b id="hud-next">...</b></div>
-                                <div class="hud-reb" id="hud-reb">Rebirth: ...</div>
-                            </div>
+                            <div class="hud-sub" id="hud-sub">Próximo: ...</div>
                         </div>
                     `;
 
@@ -1183,72 +1262,54 @@
                     styleEl.textContent = `
                         * { box-sizing: border-box; margin: 0; padding: 0; }
                         body {
-                            background-color: #0b0b12;
-                            color: #f3f4f8;
-                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                            background: #08080d;
+                            color: #fff;
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                            overflow: hidden;
                             height: 100vh;
                             display: flex;
                             align-items: center;
                             justify-content: center;
-                            padding: 10px 12px;
+                            padding: 4px 8px;
                             user-select: none;
-                            overflow: hidden;
                         }
-                        .hud-box {
+                        .hud-mini {
                             width: 100%;
                             display: flex;
                             flex-direction: column;
-                            gap: 6px;
-                            background: rgba(18, 18, 28, 0.95);
-                            border: 1px solid rgba(255, 107, 0, 0.35);
-                            border-radius: 10px;
-                            padding: 8px 12px;
+                            gap: 2px;
+                            border-left: 3px solid #ff6b00;
+                            padding-left: 8px;
                         }
-                        .hud-header {
+                        .hud-top {
                             display: flex;
                             justify-content: space-between;
                             align-items: center;
-                            font-size: 0.64rem;
-                            font-weight: 800;
-                            letter-spacing: 1px;
-                        }
-                        .hud-tag { color: #ff6b00; }
-                        .hud-clock { color: #888899; font-family: monospace; }
-                        .hud-main {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: baseline;
-                            gap: 8px;
-                            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-                            padding-bottom: 4px;
                         }
                         .hud-map {
-                            font-size: 1.05rem;
+                            font-size: 0.95rem;
                             font-weight: 900;
                             text-transform: uppercase;
-                            color: #ffffff;
                             white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;
                         }
                         .hud-timer {
                             font-family: ui-monospace, SFMono-Regular, monospace;
-                            font-size: 1.75rem;
+                            font-size: 1.55rem;
                             font-weight: 900;
                             color: #ff6b00;
-                            letter-spacing: 1px;
+                            letter-spacing: 0.5px;
                             line-height: 1;
                         }
-                        .hud-timer.reb-green { color: #00ff7f; text-shadow: 0 0 10px rgba(0, 255, 127, 0.4); }
-                        .hud-footer {
-                            display: flex;
-                            justify-content: space-between;
+                        .hud-timer.reb-green { color: #00ff7f; }
+                        .hud-sub {
                             font-size: 0.68rem;
-                            color: #9ba1b0;
+                            color: #888899;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
                         }
-                        .hud-footer b { color: #ffffff; }
-                        .hud-reb { color: #a855f7; font-weight: 700; }
-                        .hud-reb.active { color: #00ff7f; }
                     `;
                     desktopPipWindow.document.head.appendChild(styleEl);
 
@@ -1263,33 +1324,37 @@
                         timerText: document.getElementById('current-timer').innerText,
                         nextMap: document.getElementById('next-map').innerText,
                         rebirthText: document.getElementById('rebirth-timer').innerText,
-                        isRebirthActive: document.getElementById('rebirth-timer').classList.contains('rebirth-status-active'),
-                        clockText: document.getElementById('local-clock').innerText
+                        isRebirthActive: document.getElementById('rebirth-timer').classList.contains('rebirth-status-active')
                     });
                     return;
                 } catch (e) {
-                    console.warn("Document PiP não abriu, tentando Video PiP:", e);
+                    console.warn("Document PiP falhou:", e);
                 }
             }
 
-            // 4. Celular / Fallback: Canvas Video Picture-in-Picture
-            try {
-                if (!pipStream) {
-                    pipStream = pipCanvas.captureStream(10);
-                    pipVideo.srcObject = pipStream;
-                }
-                await pipVideo.play();
-                await pipVideo.requestPictureInPicture();
-            } catch (err) {
-                console.warn("PiP não suportado:", err);
-                alert("O seu navegador não suporta a janela flutuante sobreposta (Picture-in-Picture).");
-            }
+            alert("O seu navegador não suporta Picture-in-Picture. Recomendamos o Google Chrome ou Microsoft Edge no PC para pop-up flutuante nativo.");
         }
 
         pipVideo.addEventListener('enterpictureinpicture', () => setPipActiveState(true));
         pipVideo.addEventListener('leavepictureinpicture', () => setPipActiveState(false));
 
         pipBtn.addEventListener('click', togglePictureInPicture);
+
+        // Modo Mini HUD (Para quem usa janela pequena ou deseja tela limpa)
+        const hudModeBtn = document.getElementById('hud-mode-btn');
+        const hudExitBtn = document.getElementById('mini-hud-exit-btn');
+
+        if (hudModeBtn) {
+            hudModeBtn.addEventListener('click', () => {
+                document.body.classList.add('mini-hud-active');
+            });
+        }
+
+        if (hudExitBtn) {
+            hudExitBtn.addEventListener('click', () => {
+                document.body.classList.remove('mini-hud-active');
+            });
+        }
 
         // Dropdown Accordion Toggle
         const headerDropdown = document.getElementById('header-dropdown');
@@ -1300,6 +1365,7 @@
                 dropdownToggleBtn.setAttribute('aria-expanded', isOpen);
             });
         }
+
 
 
         // Inicialização
